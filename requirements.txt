@@ -4,11 +4,16 @@ Django==5.0
 django-crispy-forms==2.4
 crispy-tailwind==1.0.3
 django-htmx==1.23.2
+django-extensions==4.1
 psycopg2-binary==2.9.10
 python-decouple==3.8
 pytz==2025.2
 sqlparse==0.5.3
 tzdata==2025.2
+
+# Essential for Excel/CSV (lightweight alternatives)
+openpyxl==3.1.5
+et_xmlfile==2.0.0
 
 # Database dependencies
 dj-database-url==2.1.0
