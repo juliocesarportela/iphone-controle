@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel Administrativo - iPhone Import Manager{% endblock %}
+{% block page_title %}Painel Administrativo{% endblock %}
+{% block page_description %}Visão geral e controle do sistema{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Estatísticas Principais -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <i class="fas fa-users text-blue-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total de Usuários</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_usuarios }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-lg">
+                    <i class="fas fa-file-import text-green-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total de Importações</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_importacoes_sistema }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-lg">
+                    <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Sistema</p>
+                    <p class="text-lg font-bold text-green-600">Operacional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Administrativas -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-tools text-primary mr-2"></i>
+                Ações Administrativas
+            </h3>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Gerenciar Usuários -->
+                <a href="{% url 'core:user_management' %}" 
+                   class="block p-6 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg hover:from-blue-100 hover:to-blue-200 transition-all">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-blue-600 rounded-lg">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-lg font-semibold text-blue-900">Gerenciar Usuários</h4>
+                            <p class="text-sm text-blue-700">Criar, editar e gerenciar usuários do sistema</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Relatórios do Sistema -->
+                <a href="{% url 'core:relatorios' %}" 
+                   class="block p-6 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg hover:from-green-100 hover:to-green-200 transition-all">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-green-600 rounded-lg">
+                            <i class="fas fa-chart-bar text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-lg font-semibold text-green-900">Relatórios</h4>
+                            <p class="text-sm text-green-700">Visualizar relatórios e estatísticas</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Configurações -->
+                <a href="{% url 'core:configuracoes' %}" 
+                   class="block p-6 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg hover:from-purple-100 hover:to-purple-200 transition-all">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-purple-600 rounded-lg">
+                            <i class="fas fa-cog text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-lg font-semibold text-purple-900">Configurações</h4>
+                            <p class="text-sm text-purple-700">Configurar sistema e preferências</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do Sistema -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-info-circle text-primary mr-2"></i>
+                Informações do Sistema
+            </h3>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-semibold text-gray-900 mb-3">Funcionalidades Disponíveis</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Gerenciamento completo de usuários
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Sistema de importações com cálculos automáticos
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Relatórios detalhados com exportação
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Controle de permissões por função
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            Interface responsiva e moderna
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-md font-semibold text-gray-900 mb-3">Acesso Rápido</h4>
+                    <div class="space-y-2">
+                        <a href="{% url 'core:user_create' %}" 
+                           class="flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Criar Novo Usuário
+                        </a>
+                        <a href="{% url 'core:importacao_create' %}" 
+                           class="flex items-center p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Nova Importação
+                        </a>
+                        <a href="{% url 'core:relatorios' %}" 
+                           class="flex items-center p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            Ver Relatórios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avisos Importantes -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mt-1 mr-4"></i>
+            <div>
+                <h3 class="text-lg font-semibold text-yellow-900 mb-2">Avisos Importantes</h3>
+                <div class="text-sm text-yellow-800 space-y-2">
+                    <p><strong>🔐 Segurança:</strong> Como administrador, você tem acesso completo ao sistema. Use com responsabilidade.</p>
+                    <p><strong>👥 Usuários:</strong> Sempre mantenha pelo menos um administrador ativo no sistema.</p>
+                    <p><strong>💾 Backup:</strong> Considere fazer backups regulares dos dados importantes.</p>
+                    <p><strong>🔄 Atualizações:</strong> Mantenha o sistema atualizado para garantir segurança e performance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

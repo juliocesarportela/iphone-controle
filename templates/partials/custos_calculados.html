@@ -1,0 +1,91 @@
+<!-- Cálculos em Tempo Real - Template Parcial HTMX -->
+<div class="space-y-4">
+    <!-- Custos EUA -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+            <i class="fas fa-flag-usa mr-2"></i>
+            Custos EUA
+        </h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-blue-700">Custo EUA Total:</span>
+                <span class="font-bold text-blue-900">${{ custo_eua_total|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-blue-700">Em BRL:</span>
+                <span class="font-bold text-blue-900">R$ {{ custo_eua_brl|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frete Paraguay -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-green-800 mb-3 flex items-center">
+            <i class="fas fa-shipping-fast mr-2"></i>
+            Frete Paraguay
+        </h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-green-700">Frete PY (USD):</span>
+                <span class="font-bold text-green-900">${{ frete_py_usd|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-green-700">Frete PY (BRL):</span>
+                <span class="font-bold text-green-900">R$ {{ frete_py_brl|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custo Paraguai Total (Unitário) -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-purple-800 mb-3 flex items-center">
+            <i class="fas fa-flag mr-2"></i>
+            Custo Paraguai Total (Unitário)
+        </h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-purple-700">Custo PY (USD):</span>
+                <span class="font-bold text-purple-900">${{ custo_total_py_usd|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between border-t border-purple-200 pt-2">
+                <span class="text-purple-700 font-semibold">Custo PY (BRL):</span>
+                <span class="font-bold text-purple-900 text-lg">R$ {{ custo_total_py_brl|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custo Paraguai Total para Toda Quantidade -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-yellow-800 mb-3 flex items-center">
+            <i class="fas fa-boxes mr-2"></i>
+            Custo Paraguai Total (Toda Quantidade)
+        </h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-yellow-700">Total USD:</span>
+                <span class="font-bold text-yellow-900">${{ custo_total_quantidade_usd|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between border-t border-yellow-200 pt-2">
+                <span class="text-yellow-700 font-semibold">Total BRL:</span>
+                <span class="font-bold text-yellow-900 text-xl">R$ {{ custo_total_quantidade_brl|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo Visual -->
+    <div class="bg-gray-100 border border-gray-300 rounded-lg p-4">
+        <div class="text-center">
+            <p class="text-xs text-gray-600 mb-1">INVESTIMENTO TOTAL</p>
+            <p class="text-2xl font-bold text-gray-900">R$ {{ custo_total_quantidade_brl|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500">${{ custo_total_quantidade_usd|floatformat:2 }} USD</p>
+        </div>
+    </div>
+
+    <!-- Indicador de Atualização -->
+    <div class="text-center">
+        <p class="text-xs text-gray-500 flex items-center justify-center">
+            <i class="fas fa-sync-alt mr-1"></i>
+            Atualizado automaticamente
+        </p>
+    </div>
+</div>

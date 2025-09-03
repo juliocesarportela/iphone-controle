@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Deletar Importação - iPhone Import Manager{% endblock %}
+{% block page_title %}Deletar Importação{% endblock %}
+{% block page_description %}Confirme a exclusão da importação{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'core:importacao_detail' importacao.pk %}" 
+   class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
+    <i class="fas fa-arrow-left mr-2"></i>
+    Cancelar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <!-- Aviso de Confirmação -->
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
+                <p class="text-gray-600">Esta ação não pode ser desfeita.</p>
+            </div>
+        </div>
+
+        <!-- Detalhes da Importação -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-3">Dados da Importação:</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="text-gray-600">Produto:</span>
+                    <span class="font-medium text-gray-900 ml-2">iPhone {{ importacao.modelo }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Capacidade:</span>
+                    <span class="font-medium text-gray-900 ml-2">{{ importacao.capacidade_gb }}GB</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Grade:</span>
+                    <span class="font-medium text-gray-900 ml-2">{{ importacao.grade }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Quantidade:</span>
+                    <span class="font-medium text-gray-900 ml-2">{{ importacao.quantidade }} unidades</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Status:</span>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2
+                        {% if importacao.status == 'planejado' %}bg-gray-100 text-gray-800
+                        {% elif importacao.status == 'em_transito' %}bg-blue-100 text-blue-800
+                        {% elif importacao.status == 'recebido' %}bg-yellow-100 text-yellow-800
+                        {% elif importacao.status == 'vendido' %}bg-green-100 text-green-800
+                        {% endif %}">
+                        {{ importacao.get_status_display }}
+                    </span>
+                </div>
+                <div>
+                    <span class="text-gray-600">Data:</span>
+                    <span class="font-medium text-gray-900 ml-2">{{ importacao.data_importacao|date:"d/m/Y" }}</span>
+                </div>
+                <div class="md:col-span-2">
+                    <span class="text-gray-600">Custo Total:</span>
+                    <span class="font-bold text-gray-900 ml-2">R$ {{ importacao.custo_total_quantidade_brl|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aviso Importante -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-circle text-red-600 mt-1 mr-3"></i>
+                <div>
+                    <h4 class="text-sm font-semibold text-red-800 mb-2">Atenção!</h4>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        <li>• Esta importação será permanentemente removida do sistema</li>
+                        <li>• Todos os dados relacionados serão perdidos</li>
+                        <li>• Esta ação não pode ser desfeita</li>
+                        {% if importacao.status == 'vendido' %}
+                        <li>• <strong>Este produto já foi vendido</strong> - considere manter o histórico</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Confirmação -->
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="flex items-center">
+                <input type="checkbox" 
+                       id="confirm_delete" 
+                       name="confirm_delete" 
+                       required
+                       class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label for="confirm_delete" class="ml-2 block text-sm text-gray-900">
+                    Eu entendo que esta ação é irreversível e confirmo a exclusão
+                </label>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="{% url 'core:importacao_detail' importacao.pk %}" 
+                   class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-200">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 flex items-center"
+                        onclick="return confirm('Tem certeza absoluta que deseja deletar esta importação?')">
+                    <i class="fas fa-trash mr-2"></i>
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

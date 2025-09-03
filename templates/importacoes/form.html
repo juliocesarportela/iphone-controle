@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - iPhone Import Manager{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_description %}
+    {% if object %}Edite os dados da importação e veja os cálculos atualizados em tempo real{% else %}Crie uma nova importação com cálculos automáticos{% endif %}
+{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'core:importacao_list' %}" 
+   class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
+    <i class="fas fa-arrow-left mr-2"></i>
+    Voltar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <form method="post" hx-post="{% url 'core:calcular_custos_htmx' %}" hx-trigger="input delay:300ms from:input, change from:select" hx-target="#custos-calculados" hx-swap="innerHTML" class="p-6">
+            {% csrf_token %}
+            
+            <!-- Mobile Dropdown Toggle -->
+            <div class="block lg:hidden mb-6">
+                <div class="relative">
+                    <button type="button" 
+                            class="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                            onclick="toggleMobileSection('produto-section')">
+                        <span class="flex items-center justify-between">
+                            <span class="flex items-center">
+                                <i class="fas fa-mobile-alt text-primary mr-2"></i>
+                                Dados do Produto
+                            </span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="produto-section-icon"></i>
+                        </span>
+                    </button>
+                    <div id="produto-section" class="hidden mt-2 p-4 bg-gray-50 rounded-md">
+                        <!-- Conteúdo mobile para dados do produto será inserido aqui via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="relative mt-4">
+                    <button type="button" 
+                            class="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                            onclick="toggleMobileSection('custos-section')">
+                        <span class="flex items-center justify-between">
+                            <span class="flex items-center">
+                                <i class="fas fa-dollar-sign text-green-600 mr-2"></i>
+                                Custos & Configurações
+                            </span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="custos-section-icon"></i>
+                        </span>
+                    </button>
+                    <div id="custos-section" class="hidden mt-2 p-4 bg-gray-50 rounded-md">
+                        <!-- Conteúdo mobile para custos será inserido aqui via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="relative mt-4">
+                    <button type="button" 
+                            class="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                            onclick="toggleMobileSection('calculos-section')">
+                        <span class="flex items-center justify-between">
+                            <span class="flex items-center">
+                                <i class="fas fa-calculator text-blue-600 mr-2"></i>
+                                Cálculos
+                            </span>
+                            <i class="fas fa-chevron-down transform transition-transform" id="calculos-section-icon"></i>
+                        </span>
+                    </button>
+                    <div id="calculos-section" class="hidden mt-2 p-4 bg-gray-50 rounded-md">
+                        <!-- Conteúdo mobile para cálculos será inserido aqui via JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desktop Layout -->
+            <div class="hidden lg:grid lg:grid-cols-3 gap-6 xl:gap-8">
+                <!-- Coluna 1: Dados do Produto -->
+                <div class="space-y-4">
+                    <div class="border-b border-gray-200 pb-3">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-mobile-alt text-primary mr-2"></i>
+                            Dados do Produto
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Informações básicas do iPhone</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.modelo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Modelo do iPhone
+                        </label>
+                        {{ form.modelo }}
+                        {% if form.modelo.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.modelo.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.capacidade_gb.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Capacidade (GB)
+                        </label>
+                        {{ form.capacidade_gb }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.grade.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Grade
+                        </label>
+                        {{ form.grade }}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="{{ form.quantidade.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Quantidade
+                            </label>
+                            {{ form.quantidade }}
+                        </div>
+                        <div>
+                            <label for="{{ form.peso_kg.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                
+                            </label>
+                            {{ form.peso_kg }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Status
+                        </label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.data_importacao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Data da Importação
+                        </label>
+                        {{ form.data_importacao }}
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Custos EUA e Configurações -->
+                <div class="space-y-4">
+                    <div class="border-b border-gray-200 pb-3">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-dollar-sign text-green-600 mr-2"></i>
+                            Custos EUA & Configurações
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Valores em dólares americanos</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.valor_eua_unitario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Valor EUA Unitário ($)
+                        </label>
+                        {{ form.valor_eua_unitario }}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="{{ form.taxa_adm_fixa.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Taxa ADM Fixa ($)
+                            </label>
+                            {{ form.taxa_adm_fixa }}
+                        </div>
+                        <div>
+                            <label for="{{ form.taxa_adm_percentual.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Taxa ADM (%)
+                            </label>
+                            {{ form.taxa_adm_percentual }}
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="{{ form.frete_eua.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Frete EUA ($)
+                            </label>
+                            {{ form.frete_eua }}
+                        </div>
+                        <div>
+                            <label for="{{ form.pol_eua.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                POL EUA ($)
+                            </label>
+                            {{ form.pol_eua }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.cambio_usdt.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Câmbio USDT
+                        </label>
+                        {{ form.cambio_usdt }}
+                    </div>
+                    
+                    <!-- Frete Paraguay -->
+                    <div class="border-t border-gray-200 pt-3">
+                        <h4 class="text-md font-medium text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-shipping-fast text-blue-600 mr-2"></i>
+                            Frete Paraguay
+                        </h4>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="{{ form.frete_py_usd_kg.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Frete PY (USD/kg)
+                                </label>
+                                {{ form.frete_py_usd_kg }}
+                                <p class="text-xs text-gray-500 mt-1">Valor por kg</p>
+                            </div>
+                            <div>
+                                <label for="{{ form.kg_py_usd.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    KG PY ($)
+                                </label>
+                                {{ form.kg_py_usd }}
+                                <p class="text-xs text-gray-500 mt-1">Valor adicional</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-800">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <strong>Frete PY Total</strong> = Frete PY (USD/kg) + KG PY ($)
+                        </div>
+                    </div>
+                    
+                    <!-- Campos de Venda (Opcionais) -->
+                    <div class="border-t border-gray-200 pt-3">
+                        <h4 class="text-md font-medium text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-tag text-purple-600 mr-2"></i>
+                            Venda (Opcional)
+                        </h4>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="{{ form.preco_venda_unitario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Preço Venda (R$)
+                                </label>
+                                {{ form.preco_venda_unitario }}
+                            </div>
+                            <div>
+                                <label for="{{ form.data_venda.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Data da Venda
+                                </label>
+                                {{ form.data_venda }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna 3: Cálculos em Tempo Real -->
+                <div class="space-y-4">
+                    <div class="border-b border-gray-200 pb-3">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-calculator text-blue-600 mr-2"></i>
+                            Cálculos Automáticos
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Atualizados em tempo real</p>
+                    </div>
+                    
+                    <!-- Container para cálculos HTMX -->
+                    <div id="custos-calculados" class="space-y-3">
+                        <!-- Sempre mostrar o mesmo placeholder, independente de ser novo ou edição -->
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div class="text-center text-gray-500 py-6">
+                                <i class="fas fa-calculator text-2xl mb-2"></i>
+                                <p class="text-sm">Preencha os campos para ver os cálculos</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicador de carregamento HTMX -->
+                    <div class="htmx-indicator bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div class="flex items-center justify-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-sm text-blue-600">Calculando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'core:importacao_list' %}" 
+                       class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-200">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center">
+                        <i class="fas fa-save mr-2"></i>
+                        {% if object %}Atualizar{% else %}Salvar{% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Mobile Content Templates (Hidden) -->
+<div id="mobile-produto-content" class="hidden">
+    <div class="space-y-4">
+        <div>
+            <label for="{{ form.modelo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Modelo do iPhone
+            </label>
+            {{ form.modelo }}
+        </div>
+        
+        <div>
+            <label for="{{ form.capacidade_gb.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Capacidade (GB)
+            </label>
+            {{ form.capacidade_gb }}
+        </div>
+        
+        <div>
+            <label for="{{ form.grade.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Grade
+            </label>
+            {{ form.grade }}
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label for="{{ form.quantidade.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Quantidade
+                </label>
+                {{ form.quantidade }}
+            </div>
+            <div>
+                <label for="{{ form.peso_kg.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Peso (kg)
+                </label>
+                {{ form.peso_kg }}
+            </div>
+        </div>
+        
+        <div>
+            <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Status
+            </label>
+            {{ form.status }}
+        </div>
+        
+        <div>
+            <label for="{{ form.data_importacao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Data da Importação
+            </label>
+            {{ form.data_importacao }}
+        </div>
+    </div>
+</div>
+
+<div id="mobile-custos-content" class="hidden">
+    <div class="space-y-4">
+        <div>
+            <label for="{{ form.valor_eua_unitario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Valor EUA Unitário ($)
+            </label>
+            {{ form.valor_eua_unitario }}
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label for="{{ form.taxa_adm_fixa.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Taxa ADM Fixa ($)
+                </label>
+                {{ form.taxa_adm_fixa }}
+            </div>
+            <div>
+                <label for="{{ form.taxa_adm_percentual.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Taxa ADM (%)
+                </label>
+                {{ form.taxa_adm_percentual }}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label for="{{ form.frete_eua.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Frete EUA ($)
+                </label>
+                {{ form.frete_eua }}
+            </div>
+            <div>
+                <label for="{{ form.pol_eua.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    POL EUA ($)
+                </label>
+                {{ form.pol_eua }}
+            </div>
+        </div>
+        
+        <div>
+            <label for="{{ form.cambio_usdt.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                Câmbio USDT
+            </label>
+            {{ form.cambio_usdt }}
+        </div>
+        
+        <div class="border-t border-gray-200 pt-3 mt-3">
+            <h4 class="text-md font-medium text-gray-900 mb-3">Frete Paraguay</h4>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="{{ form.frete_py_usd_kg.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Frete PY (USD/kg)
+                    </label>
+                    {{ form.frete_py_usd_kg }}
+                </div>
+                <div>
+                    <label for="{{ form.kg_py_usd.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        KG PY ($)
+                    </label>
+                    {{ form.kg_py_usd }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-200 pt-3 mt-3">
+            <h4 class="text-md font-medium text-gray-900 mb-3">Venda (Opcional)</h4>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="{{ form.preco_venda_unitario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Preço Venda (R$)
+                    </label>
+                    {{ form.preco_venda_unitario }}
+                </div>
+                <div>
+                    <label for="{{ form.data_venda.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Data da Venda
+                    </label>
+                    {{ form.data_venda }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mobile-calculos-content" class="hidden">
+    <div id="mobile-custos-calculados" class="space-y-3">
+        <!-- Sempre mostrar o mesmo placeholder para mobile também -->
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="text-center text-gray-500 py-4">
+                <i class="fas fa-calculator text-xl mb-2"></i>
+                <p class="text-sm">Preencha os campos para ver os cálculos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMobileSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const icon = document.getElementById(sectionId + '-icon');
+    const contentId = 'mobile-' + sectionId.replace('-section', '') + '-content';
+    const content = document.getElementById(contentId);
+    
+    if (section.classList.contains('hidden')) {
+        // Show section
+        section.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        
+        // Move content from hidden template to visible section
+        if (content && section.children.length === 0) {
+            section.innerHTML = content.innerHTML;
+        }
+    } else {
+        // Hide section
+        section.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+
+// Initialize mobile sections and auto-calculate on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up HTMX target for mobile calculations
+    const mobileCalcSection = document.getElementById('calculos-section');
+    if (mobileCalcSection) {
+        // Add HTMX target attribute for mobile calculations
+        const form = document.querySelector('form');
+        if (form) {
+            form.setAttribute('hx-target', '#custos-calculados, #mobile-custos-calculados');
+        }
+    }
+    
+    // Auto-calculate if form has pre-filled values (editing mode)
+    function triggerAutoCalculation() {
+        const form = document.querySelector('form');
+        if (form) {
+            // Check if ALL key fields have values (indicating edit mode with loaded data)
+            const valorEUA = document.querySelector('input[name="valor_eua_unitario"]');
+            const quantidade = document.querySelector('input[name="quantidade"]');
+            const taxaAdmFixa = document.querySelector('input[name="taxa_adm_fixa"]');
+            const taxaAdmPerc = document.querySelector('input[name="taxa_adm_percentual"]');
+            const freteEUA = document.querySelector('input[name="frete_eua"]');
+            const polEUA = document.querySelector('input[name="pol_eua"]');
+            const cambioUSDT = document.querySelector('input[name="cambio_usdt"]');
+            const fretePyUsdKg = document.querySelector('input[name="frete_py_usd_kg"]');
+            const kgPyUsd = document.querySelector('input[name="kg_py_usd"]');
+            
+            // Verifica se TODOS os campos principais estão preenchidos (dados do banco carregados)
+            const allFieldsLoaded = valorEUA?.value && 
+                                  quantidade?.value && 
+                                  taxaAdmFixa?.value && 
+                                  taxaAdmPerc?.value &&
+                                  freteEUA?.value && 
+                                  polEUA?.value &&
+                                  cambioUSDT?.value &&
+                                  fretePyUsdKg?.value &&
+                                  kgPyUsd?.value &&
+                                  parseFloat(valorEUA.value) > 0;
+            
+            if (allFieldsLoaded) {
+                console.log('Disparando cálculo automático com TODOS os valores carregados:', {
+                    valorEUA: valorEUA.value,
+                    quantidade: quantidade.value,
+                    taxaAdmFixa: taxaAdmFixa.value,
+                    taxaAdmPerc: taxaAdmPerc.value,
+                    freteEUA: freteEUA.value,
+                    polEUA: polEUA.value,
+                    cambioUSDT: cambioUSDT.value,
+                    fretePyUsdKg: fretePyUsdKg.value,
+                    kgPyUsd: kgPyUsd.value
+                });
+                
+                // Trigger HTMX calculation by dispatching a form submit to the HTMX endpoint
+                // Criar FormData manualmente para garantir que todos os campos sejam enviados
+                const formData = new FormData();
+                
+                // Adicionar token CSRF
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                formData.append('csrfmiddlewaretoken', csrfToken);
+                
+                // Adicionar todos os campos manualmente
+                formData.append('valor_eua_unitario', valorEUA.value);
+                formData.append('quantidade', quantidade.value);
+                formData.append('taxa_adm_fixa', taxaAdmFixa.value);
+                formData.append('taxa_adm_percentual', taxaAdmPerc.value);
+                formData.append('frete_eua', freteEUA.value);
+                formData.append('pol_eua', polEUA.value);
+                formData.append('cambio_usdt', cambioUSDT.value);
+                formData.append('frete_py_usd_kg', fretePyUsdKg.value);
+                formData.append('kg_py_usd', kgPyUsd.value);
+                
+                console.log('Enviando dados para HTMX:', {
+                    valor_eua_unitario: valorEUA.value,
+                    quantidade: quantidade.value,
+                    taxa_adm_fixa: taxaAdmFixa.value,
+                    taxa_adm_percentual: taxaAdmPerc.value,
+                    frete_eua: freteEUA.value,
+                    pol_eua: polEUA.value,
+                    cambio_usdt: cambioUSDT.value,
+                    frete_py_usd_kg: fretePyUsdKg.value,
+                    kg_py_usd: kgPyUsd.value
+                });
+                
+                fetch('{% url "core:calcular_custos_htmx" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                        // CSRF token já está no FormData, não precisa no header
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // IMPORTANTE: Apenas atualizar seções de cálculos, NUNCA os campos do formulário
+                    const desktopContainer = document.getElementById('custos-calculados');
+                    const mobileContainer = document.getElementById('mobile-custos-calculados');
+                    
+                    if (desktopContainer) {
+                        desktopContainer.innerHTML = html;
+                        console.log('Cálculos desktop atualizados - campos do formulário preservados');
+                    }
+                    if (mobileContainer) {
+                        mobileContainer.innerHTML = html;
+                        console.log('Cálculos mobile atualizados - campos do formulário preservados');
+                    }
+                    
+                    // PROTEÇÃO: Verificar se algum campo do formulário foi alterado inadvertidamente
+                    console.log('Valores dos campos após cálculos HTMX:', {
+                        valor_eua: document.querySelector('input[name="valor_eua_unitario"]')?.value,
+                        taxa_adm_fixa: document.querySelector('input[name="taxa_adm_fixa"]')?.value,
+                        frete_eua: document.querySelector('input[name="frete_eua"]')?.value,
+                        pol_eua: document.querySelector('input[name="pol_eua"]')?.value
+                    });
+                })
+                .catch(error => {
+                    console.log('Erro ao calcular custos automaticamente:', error);
+                });
+            }
+        }
+    }
+    
+    // Chama a função após o DOM estar carregado e com delay MAIOR para garantir que o Django carregue todos os dados
+    setTimeout(triggerAutoCalculation, 1500);  // Aumentado para 1.5s
+    
+    // Também chama quando a página estiver totalmente carregada com delay ainda maior
+    window.addEventListener('load', function() {
+        setTimeout(triggerAutoCalculation, 1000);  // 1s após load completo
+    });
+    
+    // Tentativa adicional após mais tempo para garantir carregamento
+    setTimeout(function() {
+        triggerAutoCalculation();
+    }, 2500);  // 2.5s como última tentativa
+});
+</script>
+{% endblock %}

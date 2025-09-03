@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Usuários - iPhone Import Manager{% endblock %}
+{% block page_title %}Gerenciar Usuários{% endblock %}
+{% block page_description %}Administração de usuários do sistema{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Estatísticas dos Usuários -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total de Usuários</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.total_usuarios }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-green-100 rounded-lg">
+                    <i class="fas fa-user-check text-green-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Usuários Ativos</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.usuarios_ativos }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-purple-100 rounded-lg">
+                    <i class="fas fa-user-shield text-purple-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Administradores</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.administradores }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-orange-100 rounded-lg">
+                    <i class="fas fa-user text-orange-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Usuários Comuns</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.usuarios_comuns }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Usuários -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-users text-primary mr-2"></i>
+                Lista de Usuários
+            </h3>
+            <a href="{% url 'core:user_create' %}" 
+               class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>
+                Novo Usuário
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Usuário
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            E-mail
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Função
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Data de Cadastro
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for usuario in usuarios %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-r 
+                                        {% if usuario.role == 'admin' %}from-purple-400 to-purple-600
+                                        {% else %}from-blue-400 to-blue-600{% endif %} 
+                                        flex items-center justify-center">
+                                        <span class="text-white font-medium text-sm">
+                                            {{ usuario.first_name|first|upper }}{{ usuario.last_name|first|upper }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ usuario.first_name }} {{ usuario.last_name }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">@{{ usuario.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ usuario.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if usuario.role == 'admin' %}bg-purple-100 text-purple-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {% if usuario.role == 'admin' %}
+                                    <i class="fas fa-user-shield mr-1"></i>
+                                    Administrador
+                                {% else %}
+                                    <i class="fas fa-user mr-1"></i>
+                                    Usuário
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if usuario.is_active %}bg-green-100 text-green-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if usuario.is_active %}
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Ativo
+                                {% else %}
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Inativo
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ usuario.date_joined|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <!-- Editar -->
+                                <a href="{% url 'core:user_edit' usuario.id %}" 
+                                   class="text-blue-600 hover:text-blue-900 transition-colors"
+                                   title="Editar usuário">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <!-- Ativar/Desativar -->
+                                {% if usuario != request.user %}
+                                <a href="{% url 'core:user_toggle_status' usuario.id %}" 
+                                   class="{% if usuario.is_active %}text-yellow-600 hover:text-yellow-900{% else %}text-green-600 hover:text-green-900{% endif %} transition-colors"
+                                   title="{% if usuario.is_active %}Desativar usuário{% else %}Ativar usuário{% endif %}"
+                                   onclick="return confirm('Tem certeza que deseja {% if usuario.is_active %}desativar{% else %}ativar{% endif %} este usuário?')">
+                                    <i class="fas fa-{% if usuario.is_active %}user-slash{% else %}user-check{% endif %}"></i>
+                                </a>
+                                {% endif %}
+                                
+                                <!-- Deletar -->
+                                {% if usuario != request.user %}
+                                <a href="{% url 'core:user_delete' usuario.id %}" 
+                                   class="text-red-600 hover:text-red-900 transition-colors"
+                                   title="Deletar usuário">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="text-gray-500">
+                                <i class="fas fa-users text-4xl mb-4"></i>
+                                <p class="text-lg font-medium">Nenhum usuário encontrado</p>
+                                <p class="text-sm">Clique em "Novo Usuário" para criar o primeiro usuário.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Informações Adicionais -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 text-xl mt-1 mr-4"></i>
+            <div>
+                <h3 class="text-lg font-semibold text-blue-900 mb-2">Informações sobre Gerenciamento de Usuários</h3>
+                <div class="text-sm text-blue-800 space-y-2">
+                    <p><strong>🔐 Administradores:</strong> Têm acesso completo ao sistema, incluindo gerenciamento de usuários e relatórios.</p>
+                    <p><strong>👤 Usuários:</strong> Podem gerenciar suas próprias importações e acessar relatórios pessoais.</p>
+                    <p><strong>⚠️ Proteções:</strong> Não é possível deletar ou desativar o último administrador do sistema.</p>
+                    <p><strong>🔧 Configurações:</strong> Cada usuário tem suas próprias configurações padrão criadas automaticamente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

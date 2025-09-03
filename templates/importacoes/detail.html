@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ importacao }} - iPhone Import Manager{% endblock %}
+{% block page_title %}Detalhes da Importação{% endblock %}
+{% block page_description %}{{ importacao }}{% endblock %}
+
+{% block header_actions %}
+<div class="flex space-x-3">
+    <a href="{% url 'core:importacao_list' %}" 
+       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Voltar
+    </a>
+    <a href="{% url 'core:importacao_update' importacao.pk %}" 
+       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200">
+        <i class="fas fa-edit mr-2"></i>
+        Editar
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Coluna 1: Informações do Produto -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-mobile-alt text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">iPhone {{ importacao.modelo }}</h3>
+                    <p class="text-gray-600">{{ importacao.capacidade_gb }}GB - Grade {{ importacao.grade }}</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Quantidade:</span>
+                    <span class="font-semibold text-gray-900">{{ importacao.quantidade }} unidades</span>
+                </div>
+                
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Status:</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        {% if importacao.status == 'planejado' %}bg-gray-100 text-gray-800
+                        {% elif importacao.status == 'em_transito' %}bg-blue-100 text-blue-800
+                        {% elif importacao.status == 'recebido' %}bg-yellow-100 text-yellow-800
+                        {% elif importacao.status == 'vendido' %}bg-green-100 text-green-800
+                        {% endif %}">
+                        {{ importacao.get_status_display }}
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Data Importação:</span>
+                    <span class="font-semibold text-gray-900">{{ importacao.data_importacao|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Peso Total:</span>
+                    <span class="font-semibold text-gray-900">{{ importacao.peso_kg|floatformat:2 }} kg</span>
+                </div>
+                
+                {% if importacao.status == 'vendido' and importacao.data_venda %}
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Data Venda:</span>
+                    <span class="font-semibold text-gray-900">{{ importacao.data_venda|date:"d/m/Y" }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Coluna 2: Custos e Cálculos -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-calculator text-blue-600 mr-2"></i>
+                Custos e Cálculos
+            </h3>
+            
+            <!-- Custos EUA -->
+            <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-flag-usa text-blue-500 mr-2"></i>
+                    Custos EUA
+                </h4>
+                <div class="space-y-2 text-sm bg-blue-50 p-3 rounded-lg">
+                    <div class="flex justify-between">
+                        <span class="text-blue-700">Valor Unitário:</span>
+                        <span class="font-semibold text-blue-900">${{ importacao.valor_eua_unitario|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-blue-700">Taxa ADM Fixa:</span>
+                        <span class="font-semibold text-blue-900">${{ importacao.taxa_adm_fixa|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-blue-700">Taxa ADM %:</span>
+                        <span class="font-semibold text-blue-900">{{ importacao.taxa_adm_percentual|floatformat:1 }}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-blue-700">Frete EUA:</span>
+                        <span class="font-semibold text-blue-900">${{ importacao.frete_eua|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-blue-700">POL EUA:</span>
+                        <span class="font-semibold text-blue-900">${{ importacao.pol_eua|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between border-t border-blue-200 pt-2 mt-2">
+                        <span class="text-blue-700 font-semibold">Total EUA:</span>
+                        <span class="font-bold text-blue-900">${{ importacao.custo_eua_total|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversão e Frete PY -->
+            <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-exchange-alt text-green-500 mr-2"></i>
+                    Conversão & Frete PY
+                </h4>
+                <div class="space-y-2 text-sm bg-green-50 p-3 rounded-lg">
+                    <div class="flex justify-between">
+                        <span class="text-green-700">Câmbio USDT:</span>
+                        <span class="font-semibold text-green-900">{{ importacao.cambio_usdt|floatformat:2 }} USD</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-green-700">Frete PY/kg:</span>
+                        <span class="font-semibold text-green-900">${{ importacao.frete_py_usd_kg|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-green-700">Frete PY Total:</span>
+                        <span class="font-semibold text-green-900">${{ importacao.frete_py_usd|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between border-t border-green-200 pt-2 mt-2">
+                        <span class="text-green-700 font-semibold">Frete PY (BRL):</span>
+                        <span class="font-bold text-green-900">R$ {{ importacao.frete_py_brl|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custos Totais -->
+            <div>
+                <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-coins text-purple-500 mr-2"></i>
+                    Custos Totais
+                </h4>
+                <div class="space-y-2 text-sm bg-purple-50 p-3 rounded-lg">
+                    <div class="flex justify-between">
+                        <span class="text-purple-700">Unitário (USD):</span>
+                        <span class="font-semibold text-purple-900">${{ importacao.custo_total_py_usd|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-purple-700">Unitário (BRL):</span>
+                        <span class="font-semibold text-purple-900">R$ {{ importacao.custo_total_py_brl|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between border-t border-purple-200 pt-2 mt-2">
+                        <span class="text-purple-700 font-semibold">Total (USD):</span>
+                        <span class="font-bold text-purple-900">${{ importacao.custo_total_quantidade_usd|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-purple-700 font-semibold">Total (BRL):</span>
+                        <span class="font-bold text-purple-900 text-lg">R$ {{ importacao.custo_total_quantidade_brl|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna 3: Venda e Lucro -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-chart-line text-green-600 mr-2"></i>
+                Venda e Rentabilidade
+            </h3>
+            
+            {% if importacao.preco_venda_unitario %}
+            <!-- Informações de Venda -->
+            <div class="mb-6">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Preço Venda Unitário:</span>
+                        <span class="font-semibold text-gray-900">R$ {{ importacao.preco_venda_unitario|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Receita Total:</span>
+                        <span class="font-semibold text-gray-900">R$ {{ importacao.receita_total|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise de Lucro -->
+            <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                <h4 class="text-sm font-semibold text-green-800 mb-3">Análise de Lucro</h4>
+                
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-green-700">Lucro Unitário:</span>
+                        <span class="font-semibold {% if importacao.lucro_unitario >= 0 %}text-green-900{% else %}text-red-900{% endif %}">
+                            R$ {{ importacao.lucro_unitario|floatformat:2 }}
+                        </span>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <span class="text-green-700">Lucro Total:</span>
+                        <span class="font-bold text-lg {% if importacao.lucro_total >= 0 %}text-green-900{% else %}text-red-900{% endif %}">
+                            R$ {{ importacao.lucro_total|floatformat:2 }}
+                        </span>
+                    </div>
+                    
+                    <div class="flex justify-between border-t border-green-200 pt-2 mt-2">
+                        <span class="text-green-700 font-semibold">Margem:</span>
+                        <span class="font-bold {% if importacao.margem_percentual >= 0 %}text-green-900{% else %}text-red-900{% endif %}">
+                            {{ importacao.margem_percentual|floatformat:1 }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Sem informações de venda -->
+            <div class="text-center py-8">
+                <i class="fas fa-tag text-4xl text-gray-300 mb-4"></i>
+                <h4 class="text-lg font-medium text-gray-900 mb-2">Produto não vendido</h4>
+                <p class="text-gray-500 mb-4">Adicione o preço de venda para calcular a rentabilidade</p>
+                <a href="{% url 'core:importacao_update' importacao.pk %}" 
+                   class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fas fa-plus mr-2"></i>
+                    Adicionar Venda
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Resumo Visual -->
+    <div class="mt-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <p class="text-blue-100 text-sm mb-1">INVESTIMENTO TOTAL</p>
+                <p class="text-2xl font-bold">R$ {{ importacao.custo_total_quantidade_brl|floatformat:2 }}</p>
+                <p class="text-blue-200 text-xs">${{ importacao.custo_total_quantidade_usd|floatformat:2 }} USD</p>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-blue-100 text-sm mb-1">CUSTO UNITÁRIO</p>
+                <p class="text-xl font-bold">R$ {{ importacao.custo_total_py_brl|floatformat:2 }}</p>
+                <p class="text-blue-200 text-xs">Por unidade</p>
+            </div>
+            
+            {% if importacao.preco_venda_unitario %}
+            <div class="text-center">
+                <p class="text-blue-100 text-sm mb-1">RECEITA TOTAL</p>
+                <p class="text-xl font-bold">R$ {{ importacao.receita_total|floatformat:2 }}</p>
+                <p class="text-blue-200 text-xs">{{ importacao.quantidade }} unidades</p>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-blue-100 text-sm mb-1">LUCRO TOTAL</p>
+                <p class="text-xl font-bold {% if importacao.lucro_total >= 0 %}text-green-300{% else %}text-red-300{% endif %}">
+                    R$ {{ importacao.lucro_total|floatformat:2 }}
+                </p>
+                <p class="text-blue-200 text-xs">{{ importacao.margem_percentual|floatformat:1 }}% margem</p>
+            </div>
+            {% else %}
+            <div class="text-center col-span-2">
+                <p class="text-blue-100 text-sm mb-1">STATUS</p>
+                <p class="text-xl font-bold">{{ importacao.get_status_display }}</p>
+                <p class="text-blue-200 text-xs">Aguardando informações de venda</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

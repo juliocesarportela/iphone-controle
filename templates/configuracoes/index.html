@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Configurações - iPhone Import Manager{% endblock %}
+{% block page_title %}Configurações{% endblock %}
+{% block page_description %}Configure valores padrão para suas importações{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Seção de Administração (apenas para admins) -->
+    {% if request.user.role == 'admin' %}
+    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-purple-900 flex items-center">
+                    <i class="fas fa-user-shield text-purple-600 mr-2"></i>
+                    Administração do Sistema
+                </h3>
+                <p class="text-purple-700 mt-1">
+                    Gerencie usuários e configurações do sistema
+                </p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'core:user_management' %}" 
+                   class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    <i class="fas fa-users mr-2"></i>
+                    Gerenciar Usuários
+                </a>
+                <a href="{% url 'core:admin_panel' %}" 
+                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-tachometer-alt mr-2"></i>
+                    Painel Admin
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg p-4 border border-purple-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg">
+                        <i class="fas fa-users text-purple-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-600">Total de Usuários</p>
+                        <p class="text-lg font-bold text-gray-900">{{ total_usuarios|default:"N/A" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 border border-purple-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg">
+                        <i class="fas fa-file-import text-green-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-600">Importações do Sistema</p>
+                        <p class="text-lg font-bold text-gray-900">{{ total_importacoes_sistema|default:"N/A" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 border border-purple-200">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <i class="fas fa-chart-line text-blue-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-600">Acesso Rápido</p>
+                        <a href="{% url 'core:relatorios' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                            Ver Relatórios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-cog text-primary mr-2"></i>
+                Valores Padrão
+            </h3>
+            <p class="text-gray-600 mt-1">
+                Configure os valores padrão que serão preenchidos automaticamente ao criar novas importações.
+            </p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Câmbio e Taxas -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-medium text-gray-900 border-b border-gray-200 pb-2">
+                        Câmbio e Taxas
+                    </h4>
+                    
+                    <div>
+                        <label for="{{ form.cambio_usdt_padrao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Câmbio USDT Padrão
+                        </label>
+                        {{ form.cambio_usdt_padrao }}
+                        <p class="text-xs text-gray-500 mt-1">Taxa de câmbio USDT para BRL</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.taxa_adm_padrao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Taxa Administrativa Padrão (USD)
+                        </label>
+                        {{ form.taxa_adm_padrao }}
+                        <p class="text-xs text-gray-500 mt-1">Taxa administrativa fixa em dólares</p>
+                    </div>
+                </div>
+
+                <!-- Fretes -->
+                <div class="space-y-4">
+                    <h4 class="text-md font-medium text-gray-900 border-b border-gray-200 pb-2">
+                        Fretes
+                    </h4>
+                    
+                    <div>
+                        <label for="{{ form.frete_eua_padrao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Frete EUA Padrão (USD)
+                        </label>
+                        {{ form.frete_eua_padrao }}
+                        <p class="text-xs text-gray-500 mt-1">Frete padrão nos Estados Unidos</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.pol_eua_padrao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            POL EUA Padrão (USD)
+                        </label>
+                        {{ form.pol_eua_padrao }}
+                        <p class="text-xs text-gray-500 mt-1">POL padrão nos Estados Unidos</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.frete_py_padrao.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Frete Paraguay Padrão (USD/kg)
+                        </label>
+                        {{ form.frete_py_padrao }}
+                        <p class="text-xs text-gray-500 mt-1">Frete por kg no Paraguay</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="text-sm font-medium text-blue-800 mb-2">Como funciona?</h4>
+                        <ul class="text-sm text-blue-700 space-y-1">
+                            <li>• Estes valores serão preenchidos automaticamente ao criar novas importações</li>
+                            <li>• Você pode alterar os valores individualmente em cada importação</li>
+                            <li>• As configurações são salvas por usuário</li>
+                            <li>• Baseado na análise da sua planilha Excel atual</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <button type="button" 
+                        onclick="resetToDefaults()"
+                        class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-200">
+                    Restaurar Padrões
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar Configurações
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Valores Atuais da Planilha -->
+    <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-file-excel text-green-600 mr-2"></i>
+            Valores Identificados na Planilha
+        </h3>
+        <p class="text-gray-600 mb-4">
+            Baseado na análise da sua planilha "Modelo_Custos_EUA_PY_GSheets.xlsx":
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Valores Fixos Encontrados</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Taxa ADM: $1.90</li>
+                    <li>• Frete EUA: $1.93</li>
+                    <li>• POL EUA: $10.00</li>
+                </ul>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Câmbio Típico</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• USDT: ~5.56</li>
+                    <li>• Variação: 5.50 - 5.60</li>
+                </ul>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Modelos Encontrados</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• iPhone 11, 13, 14, 15</li>
+                    <li>• PRO, PRO MAX</li>
+                    <li>• 128GB, 256GB, 512GB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function resetToDefaults() {
+    if (confirm('Tem certeza que deseja restaurar os valores padrão baseados na planilha?')) {
+        document.getElementById('{{ form.cambio_usdt_padrao.id_for_label }}').value = '5.56';
+        document.getElementById('{{ form.taxa_adm_padrao.id_for_label }}').value = '1.90';
+        document.getElementById('{{ form.frete_eua_padrao.id_for_label }}').value = '1.93';
+        document.getElementById('{{ form.pol_eua_padrao.id_for_label }}').value = '10.00';
+        document.getElementById('{{ form.frete_py_padrao.id_for_label }}').value = '7.50';
+    }
+}
+</script>
+{% endblock %}

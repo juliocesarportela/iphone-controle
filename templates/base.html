@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}iPhone Import Manager{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Alpine.js -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Flowbite -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        .sidebar-active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    {% if user.is_authenticated %}
+    <!-- Sidebar -->
+    <aside class="fixed top-0 left-0 z-40 w-64 h-screen bg-white shadow-lg border-r border-gray-200">
+        <div class="h-full px-3 py-4 overflow-y-auto">
+            <!-- Logo -->
+            <div class="flex items-center pl-2.5 mb-8">
+                <i class="fas fa-mobile-alt text-2xl text-primary mr-3"></i>
+                <span class="text-xl font-bold text-gray-900">iPhone Import</span>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'core:dashboard' %}" 
+                       class="flex items-center p-3 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.resolver_match.url_name == 'dashboard' %}sidebar-active{% endif %}">
+                        <i class="fas fa-chart-line w-5 h-5 text-gray-500 group-hover:text-gray-900"></i>
+                        <span class="ml-3">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:importacao_list' %}" 
+                       class="flex items-center p-3 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'importacao' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                        <i class="fas fa-box w-5 h-5 text-gray-500 group-hover:text-gray-900"></i>
+                        <span class="ml-3">Importações</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:relatorios' %}" 
+                       class="flex items-center p-3 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.resolver_match.url_name == 'relatorios' %}sidebar-active{% endif %}">
+                        <i class="fas fa-chart-bar w-5 h-5 text-gray-500 group-hover:text-gray-900"></i>
+                        <span class="ml-3">Relatórios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:configuracoes' %}" 
+                       class="flex items-center p-3 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.resolver_match.url_name == 'configuracoes' %}sidebar-active{% endif %}">
+                        <i class="fas fa-cog w-5 h-5 text-gray-500 group-hover:text-gray-900"></i>
+                        <span class="ml-3">Configurações</span>
+                    </a>
+                </li>
+                {% if user.role == 'admin' %}
+                <li class="pt-4 mt-4 border-t border-gray-200">
+                    <a href="{% url 'core:admin_panel' %}" 
+                       class="flex items-center p-3 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'admin' in request.resolver_match.url_name %}sidebar-active{% endif %}">
+                        <i class="fas fa-users-cog w-5 h-5 text-gray-500 group-hover:text-gray-900"></i>
+                        <span class="ml-3">Administração</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- User Info & Logout -->
+            <div class="absolute bottom-4 left-4 right-4">
+                <div class="bg-gray-100 rounded-lg p-3 mb-3">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">{{ user.first_name|default:user.username }}</p>
+                            <p class="text-xs text-gray-500">{{ user.get_role_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'core:logout' %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg w-full text-left">
+                        <i class="fas fa-sign-out-alt w-4 h-4"></i>
+                        <span class="ml-2 text-sm">Sair</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="p-4 ml-64">
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{% block page_title %}Dashboard{% endblock %}</h1>
+                        <p class="text-gray-600">{% block page_description %}Bem-vindo ao sistema de gestão de importações{% endblock %}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- HTMX Loading Indicator -->
+                        <div class="htmx-indicator">
+                            <div class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-600">Calculando...</span>
+                            </div>
+                        </div>
+                        {% block header_actions %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-50 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-800 px-4 py-3 rounded-lg mb-4" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        {% block content %}{% endblock %}
+    </div>
+    {% else %}
+    <!-- Login Layout -->
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <i class="fas fa-mobile-alt text-6xl text-primary mb-4"></i>
+                <h2 class="text-3xl font-bold text-gray-900">iPhone Import Manager</h2>
+                <p class="mt-2 text-gray-600">Sistema de Gestão de Importações</p>
+            </div>
+            {% block login_content %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- HTMX Config -->
+    <script>
+        document.body.addEventListener('htmx:configRequest', function(evt) {
+            evt.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+    </script>
+</body>
+</html>

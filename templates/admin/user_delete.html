@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - iPhone Import Manager{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_description %}Confirmar exclusão do usuário {{ user_obj.username }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-red-200">
+        <div class="px-6 py-4 border-b border-red-200 bg-red-50">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-red-900 flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                    Confirmar Exclusão
+                </h3>
+                <a href="{% url 'core:user_management' %}" 
+                   class="text-red-500 hover:text-red-700 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <!-- Informações do Usuário -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12">
+                        <div class="h-12 w-12 rounded-full bg-gradient-to-r 
+                            {% if user_obj.role == 'admin' %}from-purple-400 to-purple-600
+                            {% else %}from-blue-400 to-blue-600{% endif %} 
+                            flex items-center justify-center">
+                            <span class="text-white font-medium">
+                                {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-lg font-semibold text-gray-900">
+                            {{ user_obj.first_name }} {{ user_obj.last_name }}
+                        </h4>
+                        <p class="text-sm text-gray-600">@{{ user_obj.username }}</p>
+                        <p class="text-sm text-gray-600">{{ user_obj.email }}</p>
+                        <div class="mt-2">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if user_obj.role == 'admin' %}bg-purple-100 text-purple-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {% if user_obj.role == 'admin' %}
+                                    <i class="fas fa-user-shield mr-1"></i>
+                                    Administrador
+                                {% else %}
+                                    <i class="fas fa-user mr-1"></i>
+                                    Usuário
+                                {% endif %}
+                            </span>
+                            <span class="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                {% if user_obj.is_active %}bg-green-100 text-green-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if user_obj.is_active %}
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Ativo
+                                {% else %}
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Inativo
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso de Exclusão -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="text-lg font-semibold text-red-900 mb-2">Atenção!</h4>
+                        <p class="text-red-800 mb-3">
+                            Você está prestes a <strong>deletar permanentemente</strong> este usuário do sistema.
+                        </p>
+                        <div class="text-sm text-red-700 space-y-1">
+                            <p><strong>⚠️ Esta ação não pode ser desfeita!</strong></p>
+                            <p>• Todas as importações deste usuário serão mantidas no sistema</p>
+                            <p>• As configurações personalizadas do usuário serão perdidas</p>
+                            <p>• O usuário não poderá mais fazer login no sistema</p>
+                            <p>• Relatórios históricos permanecerão disponíveis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas do Usuário -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h4 class="text-md font-semibold text-blue-900 mb-3 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
+                    Dados do Usuário
+                </h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-blue-700"><strong>Cadastrado em:</strong></p>
+                        <p class="text-blue-600">{{ user_obj.date_joined|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-blue-700"><strong>Último login:</strong></p>
+                        <p class="text-blue-600">
+                            {% if user_obj.last_login %}
+                                {{ user_obj.last_login|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Nunca fez login
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-blue-700"><strong>Total de importações:</strong></p>
+                        <p class="text-blue-600">{{ user_obj.importacao_set.count }} registros</p>
+                    </div>
+                    <div>
+                        <p class="text-blue-700"><strong>Status atual:</strong></p>
+                        <p class="text-blue-600">
+                            {% if user_obj.is_active %}Ativo{% else %}Inativo{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Confirmação -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="confirm-delete" class="form-checkbox h-4 w-4 text-red-600" required>
+                        <span class="ml-2 text-sm text-gray-700">
+                            Eu entendo que esta ação é <strong>irreversível</strong> e confirmo que desejo deletar este usuário permanentemente.
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex justify-end space-x-3">
+                    <a href="{% url 'core:user_management' %}" 
+                       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            id="delete-button"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                        <i class="fas fa-trash mr-2"></i>
+                        Deletar Usuário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('confirm-delete');
+    const deleteButton = document.getElementById('delete-button');
+    
+    checkbox.addEventListener('change', function() {
+        deleteButton.disabled = !this.checked;
+    });
+});
+</script>
+{% endblock %}
