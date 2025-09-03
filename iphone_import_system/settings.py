@@ -118,20 +118,22 @@ except ImportError:
 # Usar SQLite por padrão, PostgreSQL quando configurado
 USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
 
-# Check if we're on Vercel (force PostgreSQL)
+# Database configuration - Use SQLite on Vercel temporarily
+# This bypasses Supabase connection issues for initial testing
 if os.environ.get('VERCEL'):
-    USE_SQLITE = False
+    # Force SQLite on Vercel for now
+    USE_SQLITE = True
 
 if USE_SQLITE:
-    # SQLite para desenvolvimento
+    # SQLite para desenvolvimento e Vercel (temporário)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': ':memory:',  # In-memory database for Vercel
         }
     }
 else:
-    # PostgreSQL Supabase para produção
+    # PostgreSQL Supabase para produção (quando configurado)
     db_password = config('SUPABASE_DB_PASSWORD', default='')
     
     if db_password:
