@@ -4,16 +4,33 @@
     {
       "src": "iphone_import_system/wsgi.py",
       "use": "@vercel/python",
-      "config": { 
-        "maxLambdaSize": "15mb", 
+      "config": {
+        "maxLambdaSize": "15mb",
         "runtime": "python3.9"
       }
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "iphone_import_system/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONPATH": "$PYTHONPATH:.",
+    "DJANGO_SETTINGS_MODULE": "iphone_import_system.settings"
+  },
+  "functions": {
+    "iphone_import_system/wsgi.py": {
+      "includeFiles": "**"
+    }
+  }
 }
