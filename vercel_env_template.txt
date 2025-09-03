@@ -1,0 +1,10 @@
+# Environment variables for Vercel deployment
+# Configure these in your Vercel dashboard under Settings > Environment Variables
+
+SECRET_KEY=your-secret-key-here-change-this
+DEBUG=False
+USE_SQLITE=False
+SUPABASE_DB_PASSWORD=your-supabase-password-here
+
+# Optional
+CUSTOM_DOMAIN=your-custom-domain.com

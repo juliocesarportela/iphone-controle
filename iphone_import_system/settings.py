@@ -17,26 +17,40 @@ from decouple import config, Csv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# Try to import decouple, fallback to os.environ if not available
+try:
+    from decouple import config
+except ImportError:
+    def config(key, default=None, cast=None):
+        value = os.environ.get(key, default)
+        if cast and value is not None:
+            try:
+                return cast(value)
+            except (ValueError, TypeError):
+                return default
+        return value
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&eqk9$()2fm+mqp#y33jo8sh1%$zg#l3m1pxn*nn!i2=!5kv%2'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-vercel-deployment-12345')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Allowed hosts for production
+# Allowed hosts configuration
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.vercel.app',
     '.now.sh',
-    'iphone-controle.vercel.app',  # Seu domínio Vercel
-    config('ALLOWED_HOST', default=''),
+    'iphone-controle.vercel.app',
+    'iphone-controle-git-main-juliocesarportelas-projects.vercel.app',
+    'iphone-controle-juliocesarportelas-projects.vercel.app',
 ]
 
+# Add any custom domains
+custom_domain = config('CUSTOM_DOMAIN', default='')
+if custom_domain:
+    ALLOWED_HOSTS.append(custom_domain)
 
 # Application definition
 
@@ -93,11 +107,20 @@ WSGI_APPLICATION = 'iphone_import_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-import dj_database_url
+# Database configuration with fallback
+try:
+    import dj_database_url
+    DJ_DATABASE_URL_AVAILABLE = True
+except ImportError:
+    DJ_DATABASE_URL_AVAILABLE = False
 
 # Configuração do banco de dados
 # Usar SQLite por padrão, PostgreSQL quando configurado
 USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
+
+# Check if we're on Vercel (force PostgreSQL)
+if os.environ.get('VERCEL'):
+    USE_SQLITE = False
 
 if USE_SQLITE:
     # SQLite para desenvolvimento
@@ -109,19 +132,30 @@ if USE_SQLITE:
     }
 else:
     # PostgreSQL Supabase para produção
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': config('SUPABASE_DB_PASSWORD', default=''),
-            'HOST': 'db.whkxlrzscxuctkwtdknj.supabase.co',
-            'PORT': '5432',
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
+    db_password = config('SUPABASE_DB_PASSWORD', default='')
+    
+    if db_password:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'postgres',
+                'USER': 'postgres.whkxlrzscxuctkwtdknj',
+                'PASSWORD': db_password,
+                'HOST': 'aws-0-us-east-1.pooler.supabase.com',
+                'PORT': '6543',
+                'OPTIONS': {
+                    'sslmode': 'require',
+                },
+            }
         }
-    }
+    else:
+        # Fallback to SQLite if no password configured
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 # Configuração alternativa usando URL do Supabase
 # DATABASE_URL = config('DATABASE_URL', default='')
