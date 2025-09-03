@@ -177,9 +177,13 @@ SUPABASE_KEY = config('SUPABASE_KEY', default='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+
+# Apenas adicionar STATICFILES_DIRS se o diretório existir
+static_dir = os.path.join(BASE_DIR, 'static')
+if os.path.exists(static_dir):
+    STATICFILES_DIRS = [static_dir]
+else:
+    STATICFILES_DIRS = []
 
 # Media files
 MEDIA_URL = '/media/'
