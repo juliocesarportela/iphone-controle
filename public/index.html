@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Manager - Sistema de Gestão de Importações</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+        
+        .status {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .status h3 {
+            color: #2f855a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h4 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .buttons {
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📱</div>
+        <h1>iPhone Manager</h1>
+        <p class="subtitle">Sistema de Gestão de Importações de iPhone</p>
+        
+        <div class="status">
+            <h3>✅ Sistema Online no Vercel!</h3>
+            <p>Ambiente de produção funcionando corretamente</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h4>🚀 Deploy Realizado</h4>
+                <p>Sistema deployado com sucesso no Vercel</p>
+            </div>
+            <div class="feature">
+                <h4>🔧 API Funcionando</h4>
+                <p>Endpoints de teste validados e operacionais</p>
+            </div>
+            <div class="feature">
+                <h4>🗄️ Banco Configurado</h4>
+                <p>Integração com Supabase PostgreSQL</p>
+            </div>
+            <div class="feature">
+                <h4>📊 Relatórios Prontos</h4>
+                <p>Sistema de relatórios e exportação implementado</p>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <a href="/api/hello" class="btn btn-secondary">🧪 Teste API</a>
+            <a href="/api/django_test" class="btn btn-secondary">🔧 Teste Django</a>
+            <a href="/admin" class="btn">🔐 Acessar Sistema</a>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Próximos Passos:</strong></p>
+            <p>1. Configurar variáveis de ambiente no Vercel</p>
+            <p>2. Executar migrações do banco de dados</p>
+            <p>3. Criar superusuário para acesso</p>
+            <p>4. Ativar sistema Django completo</p>
+        </div>
+    </div>
+</body>
+</html>
