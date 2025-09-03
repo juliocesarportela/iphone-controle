@@ -1,28 +1,32 @@
+# Core Django dependencies (lightweight for Vercel)
 asgiref==3.9.1
-crispy-tailwind==1.0.3
 Django==5.0
 django-crispy-forms==2.4
-django-extensions==4.1
+crispy-tailwind==1.0.3
 django-htmx==1.23.2
-et_xmlfile==2.0.0
-numpy==2.3.2
-openpyxl==3.1.5
-pandas==2.3.2
-pillow==11.3.0
 psycopg2-binary==2.9.10
-python-dateutil==2.9.0.post0
 python-decouple==3.8
 pytz==2025.2
-six==1.17.0
 sqlparse==0.5.3
 tzdata==2025.2
 
-# PDF and Excel export dependencies
-reportlab==4.0.9
-xlsxwriter==3.2.0
-matplotlib==3.8.4
-seaborn==0.13.2
-
-# PostgreSQL and Supabase dependencies
+# Database dependencies
 dj-database-url==2.1.0
+
+# Supabase (lightweight version)
 supabase==2.7.4
+
+# REMOVED FOR VERCEL DEPLOYMENT (too heavy - 250MB+ limit):
+# Heavy libraries that cause deployment size issues:
+# numpy==2.3.2 (100MB+)
+# pandas==2.3.2 (50MB+) 
+# matplotlib==3.8.4 (50MB+)
+# seaborn==0.13.2 (depends on matplotlib)
+# reportlab==4.0.9 (20MB+)
+# xlsxwriter==3.2.0
+# pillow==11.3.0 (20MB+)
+# openpyxl==3.1.5
+# et_xmlfile==2.0.0
+# python-dateutil==2.9.0.post0
+# six==1.17.0
+# django-extensions==4.1

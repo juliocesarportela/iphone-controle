@@ -8,26 +8,41 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
 from decimal import Decimal
-import json
-from datetime import datetime, timedelta
-import io
-import base64
 
 # PDF and Excel export imports (conditional)
+REPORTLAB_AVAILABLE = False
+XLSXWRITER_AVAILABLE = False
+MATPLOTLIB_AVAILABLE = False
+
 try:
     from reportlab.lib.pagesizes import letter, A4
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    pass
+
+try:
     import xlsxwriter
+    XLSXWRITER_AVAILABLE = True
+except ImportError:
+    pass
+
+try:
     import matplotlib
     matplotlib.use('Agg')  # Use non-interactive backend
     import matplotlib.pyplot as plt
     import seaborn as sns
-    EXPORT_AVAILABLE = True
+    MATPLOTLIB_AVAILABLE = True
 except ImportError:
-    EXPORT_AVAILABLE = False
+    pass
+
+import json
+from datetime import datetime, timedelta
+import io
+import base64
 
 from .models import User, Importacao, ConfiguracaoPadrao, HistoricoPreco
 from .forms import ImportacaoForm, ConfiguracaoForm, UserForm
