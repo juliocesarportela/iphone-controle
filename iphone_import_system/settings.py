@@ -126,12 +126,22 @@ if os.environ.get('VERCEL'):
 
 if USE_SQLITE:
     # SQLite para desenvolvimento e Vercel (temporário)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',  # In-memory database for Vercel
+    if os.environ.get('VERCEL'):
+        # In-memory database apenas no Vercel
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
+            }
         }
-    }
+    else:
+        # Arquivo SQLite persistente para desenvolvimento local
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
     # PostgreSQL Supabase para produção (quando configurado)
     db_password = config('SUPABASE_DB_PASSWORD', default='')
