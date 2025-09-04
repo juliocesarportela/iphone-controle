@@ -11,6 +11,10 @@ pytz==2025.2
 sqlparse==0.5.3
 tzdata==2025.2
 
+# Production server dependencies (essential for deployment)
+gunicorn==21.2.0
+whitenoise==6.6.0
+
 # PostgreSQL e Supabase dependencies
 dj-database-url==2.1.0
 supabase==2.7.4

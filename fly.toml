@@ -1,0 +1,28 @@
+app = "iphone-manager"
+primary_region = "mia"
+
+[build]
+
+[env]
+  DJANGO_SETTINGS_MODULE = "iphone_import_system.production_settings"
+  DEBUG = "False"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+[deploy]
+  release_command = "python manage.py migrate --noinput"
+
+[[statics]]
+  guest_path = "/app/staticfiles"
+  url_prefix = "/static/"

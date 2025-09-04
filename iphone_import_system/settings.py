@@ -36,12 +36,18 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-verc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Allowed hosts configuration
+# Allowed hosts configuration for production deployment
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    '0.0.0.0',  # For production servers
     '.vercel.app',
     '.now.sh',
+    '.render.com',  # Render platform
+    '.onrender.com',  # Render platform
+    '.fly.dev',  # Fly.io platform
+    '.railway.app',  # Railway platform
+    '.herokuapp.com',  # Heroku platform
     'iphone-controle.vercel.app',
     'iphone-controle-git-main-juliocesarportelas-projects.vercel.app',
     'iphone-controle-juliocesarportelas-projects.vercel.app',
